@@ -15,21 +15,21 @@ export default function LoginPage() {
     if (users[phone] && users[phone] === password) {
       router.push("/1");
     } else {
-      setError("Invalid phone number or password");
+      setError("❌ Invalid phone number or password");
     }
   };
 
   return (
-    <div className="flex min-h-screen justify-center items-center bg-gray-950 text-white px-4">
+    <div className="flex min-h-screen justify-center items-center bg-black text-green-400 font-mono bg-[radial-gradient(#0f0_1px,transparent_1px)] bg-[size:20px_20px] px-4">
       <form
         onSubmit={handleSubmit}
-        className="bg-gray-800 p-10 rounded-3xl shadow-2xl w-full max-w-md space-y-6"
+        className="bg-black border border-green-700 shadow-[0_0_20px_#00ff00] p-10 rounded-2xl w-full max-w-md space-y-6"
       >
-        <h2 className="text-3xl font-extrabold text-center mb-2">
-          Welcome Back
+        <h2 className="text-3xl font-bold text-center neon-title">
+          Morse Login
         </h2>
-        <p className="text-sm text-gray-400 text-center mb-4">
-          Please login to continue
+        <p className="text-sm text-green-300 text-center">
+          Enter your credentials to begin.
         </p>
 
         <div className="space-y-4">
@@ -38,7 +38,7 @@ export default function LoginPage() {
             placeholder="📱 Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+            className="w-full p-3 bg-black border border-green-500 rounded-lg text-green-400 placeholder-green-500 focus:outline-none focus:ring-2 focus:ring-green-400"
             required
           />
           <input
@@ -46,16 +46,20 @@ export default function LoginPage() {
             placeholder="🔒 Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+            className="w-full p-3 bg-black border border-green-500 rounded-lg text-green-400 placeholder-green-500 focus:outline-none focus:ring-2 focus:ring-green-400"
             required
           />
         </div>
 
-        {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+        {error && (
+          <p className="text-red-400 text-sm text-center font-semibold">
+            {error}
+          </p>
+        )}
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl text-lg font-semibold transition"
+          className="w-full bg-black border border-green-500 text-green-400 hover:bg-green-700 hover:text-black p-3 rounded-lg font-bold transition shadow-[0_0_10px_#00ff00]"
         >
           Login
         </button>
