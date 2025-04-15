@@ -1,10 +1,10 @@
 "use client";
 
-import { use } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { answers } from "@/data/answers";
 import Navbar from "@/app/component/navbar";
+import { useUser } from "@/app/context/UserContext";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -13,62 +13,153 @@ interface PageProps {
 export default function DynamicPage({ params }: PageProps) {
   const { id } = use(params);
   const router = useRouter();
-  const username = "John Doe";
 
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState("");
+  const [isAccess, setIsAccess] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { userId, finalString } = useUser();
+
+  const checkProgress = async () => {
+    console.log("inside check progress", userId, finalString);
+
+    try {
+      const response = await fetch("/api/currentqn", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: userId }),
+      });
+
+      console.log("page dynamic", response);
+
+      if (response.status === 204) {
+        // All questions completed
+        router.push("/final");
+        return;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Failed to fetch current question:", errorData.message);
+        return;
+      }
+
+      const data = await response.json();
+      console.log(data);
+      const nextQuestionField = data.nextQuestionField;
+
+      if (`ans${id}` === nextQuestionField) {
+        setIsAccess(true);
+        console.log("You are at the correct question!");
+      } else {
+        if (nextQuestionField === "ans0") {
+          router.push("/login");
+        } else {
+          const qn = nextQuestionField.replace("ans", "");
+          router.push(`/${qn}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error while checking progress:", error);
+    }
+  };
+ 
+
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     const correctAnswer = answers[id];
     if (answer.trim().toLowerCase() === correctAnswer?.toLowerCase()) {
-      const nextId = (parseInt(id) + 1).toString();
-      if (nextId === "4") router.push("/final");
-      else router.push(`/${nextId}`);
+
+      try {
+        const response = await fetch("/api/setans", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: userId, number: id }),
+        });
+        console.log(response);
+        if (response.ok) {
+          const nextId = (parseInt(id) + 1).toString();
+          if (nextId === "7") router.push("/final");
+          else router.push(`/${nextId}`);
+        }
+      } catch (error) {
+        console.error(error)
+      }
     } else {
       setError("❌ Answer is wrong. Try again!");
     }
   };
 
-  return (
-    <div className="min-h-screen bg-black text-green-400 font-mono bg-[radial-gradient(#0f0_1px,transparent_1px)] bg-[size:20px_20px]">
-      <Navbar username={username} questionNumber={id} />
+  useEffect(() => {
+    checkProgress();
+  }, [])
 
-      <div className="max-w-2xl mx-auto mt-10 p-6 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-2 neon-title">
-          Morse iT! 3.0
-        </h1>
-        <h2 className="text-xl font-semibold mb-6 text-green-500">
-          Morse Code Puzzle Challenge
-        </h2>
+  
+  if (isAccess)
+    return (
+      <div className="min-h-screen bg-black text-green-400 font-mono bg-[radial-gradient(#0f0_1px,transparent_1px)] bg-[size:20px_20px]">
+        <Navbar questionNumber={id} />
 
-        <img
-          src={`/questions/${id}.jpg`}
-          alt={`Question ${id}`}
-          className="mx-auto rounded-lg border border-green-500 p-2 max-h-72 object-contain mb-6"
-        />
+        <div className="max-w-2xl mx-auto mt-10 p-6 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-2 neon-title">
+            Morse iT! 3.0
+          </h1>
+          <h2 className="text-xl font-semibold mb-6 text-green-500">
+            Morse Code Puzzle Challenge
+          </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            placeholder="Enter your answer here..."
-            className="w-full p-3 bg-black text-green-300 border border-green-500 rounded-md placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-400"
+          <img
+            src={`/questions/${id}.jpg`}
+            alt={`Question ${id}`}
+            className="mx-auto rounded-lg border border-green-500 p-2 max-h-72 object-contain mb-6"
           />
-          {error && <p className="text-red-400 text-sm">{error}</p>}
-          <button
-            type="submit"
-            className="bg-black border border-green-500 text-green-400 px-6 py-2 rounded-md hover:bg-green-800 hover:text-black transition-all duration-200 shadow-[0_0_10px_#00ff00]"
-          >
-            Submit
-          </button>
-        </form>
 
-        <footer className="mt-10 text-xs text-gray-600 border-t border-green-900 pt-4">
-          IEEE ComSoc Kerala Chapter | Morse iT! 3.0
-        </footer>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="text"
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              placeholder="Enter your answer here..."
+              className="w-full p-3 bg-black text-green-300 border border-green-500 rounded-md placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-400"
+            />
+            {error && <p className="text-red-400 text-sm">{error}</p>}
+            <button
+              type="submit"
+              className="bg-black border border-green-500 text-green-400 px-6 py-2 rounded-md hover:bg-green-800 hover:text-black transition-all duration-200 shadow-[0_0_10px_#00ff00]"
+            >
+              Submit
+            </button>
+          </form>
+
+          <footer className="mt-10 text-xs text-gray-600 border-t border-green-900 pt-4">
+            IEEE ComSoc Kerala Chapter | Morse iT! 3.0
+          </footer>
+        </div>
       </div>
-    </div>
-  );
+    );
+  else
+    return (
+      <div className="min-h-screen bg-black text-green-400 font-mono flex items-center justify-center bg-[radial-gradient(#0f0_1px,transparent_1px)] bg-[size:20px_20px]">
+        <div className="text-center animate-pulse space-y-4">
+          <h1 className="text-4xl md:text-5xl font-bold neon-title">
+            Morse iT! 3.0
+          </h1>
+          <p className="text-green-500 text-lg">
+            Initializing Secure Channel...
+          </p>
+          <p className="text-green-300 text-sm tracking-wider">
+            Redirecting to your challenge...
+          </p>
+          <div className="mt-4 flex justify-center space-x-1">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce" />
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce delay-150" />
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce delay-300" />
+          </div>
+        </div>
+      </div>
+    );
 }

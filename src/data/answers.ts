@@ -3,4 +3,7 @@ export const answers: Record<string, string> = {
   "1": "INTROVERT",
   "2": "SOS",
   "3": "HAPPY",
+  "4": "HAPPY",
+  "5": "HAPPY",
+  "6": "HAPPY",
 };

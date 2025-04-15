@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { users } from "@/data/user";
+import { useUser } from "@/app/context/UserContext";
 
 export default function LoginPage() {
   const [phone, setPhone] = useState("");
@@ -10,14 +10,43 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { setUserId, setName, setFinalString } = useUser();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (users[phone] && users[phone] === password) {
+    setError("");
+
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ phone, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Something went wrong.");
+        return;
+      }
+
+      console.log("User:", data);
+
+      // Assuming the response has fields 'id', 'name' for the logged-in user
+      setName(data.name); // Set the user's name in context
+      setUserId(data.id); // Set the user's id in context
+      setFinalString(data.id); // Reset the finalString value
+
+      // Always redirect to "/1"
       router.push("/1");
-    } else {
-      setError("❌ Invalid phone number or password");
+    } catch (error) {
+      console.error("Login failed:", error);
+      setError("An unexpected error occurred.");
     }
   };
+
 
   return (
     <div className="flex min-h-screen justify-center items-center bg-black text-green-400 font-mono bg-[radial-gradient(#0f0_1px,transparent_1px)] bg-[size:20px_20px] px-4">
