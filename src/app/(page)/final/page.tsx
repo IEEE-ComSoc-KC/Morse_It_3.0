@@ -1,7 +1,48 @@
 "use client";
 
+import { useUser } from "@/app/context/UserContext";
+import { useEffect, useState } from "react";
+
 export default function ResultPage() {
-  const score = 15;
+  const { userId } = useUser(); // Get user context, which contains user id
+  const [point, setPoint] = useState<number | null>(null);
+  const [timeTaken, setTimeTaken] = useState<string>("");
+
+  useEffect(() => {
+    // Ensure user ID exists before making the request
+    if (userId) {
+      // Call the API and pass user ID in the request
+      const fetchResultData = async () => {
+        try {
+          const response = await fetch("/api/getPoint", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id: userId }), // Pass the user ID
+          });
+
+          const data = await response.json();
+          console.log(data.point);
+          console.log(data.hours);
+          console.log(data.minutes);
+          console.log(data.seconds);
+
+          setPoint(data.point);
+          let time = ""
+          if (data.hours !== 0) time += `${data.hours} Hours `;
+          if (data.minutes !== 0) time += `${data.minutes} Minutes `;
+          if (data.seconds !== 0) time += `${data.seconds} Seconds`;
+
+          setTimeTaken(time)
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+
+      fetchResultData();
+    }
+  }, [userId]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-green-400 font-mono bg-[radial-gradient(#0f0_1px,transparent_1px)] bg-[size:20px_20px] px-4">
@@ -20,7 +61,16 @@ export default function ResultPage() {
 
         <div className="mt-4">
           <h2 className="text-2xl font-semibold">Your Score</h2>
-          <p className="text-5xl font-extrabold text-green-300 mt-2">{score}</p>
+          <p className="text-5xl font-extrabold text-green-300 mt-2">
+            {point ?? "Loading..."}
+          </p>
+        </div>
+
+        <div className="mt-4">
+          <h2 className="text-2xl font-semibold">Time Taken</h2>
+          <p className="text-xl text-green-300 mt-2">
+            {timeTaken ? timeTaken : "Loading..."}
+          </p>
         </div>
 
         <footer className="pt-4 border-t border-green-900 text-xs text-green-500">

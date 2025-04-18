@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { answers } from "@/data/answers";
 import Navbar from "@/app/component/navbar";
 import { useUser } from "@/app/context/UserContext";
+import Leaderboard from "@/app/component/leaderboard";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -139,11 +140,13 @@ export default function DynamicPage({ params }: PageProps) {
             IEEE ComSoc Kerala Chapter | Morse iT! 3.0
           </footer>
         </div>
+
+        <Leaderboard />
       </div>
     );
   else
     return (
-      <div className="min-h-screen bg-black text-green-400 font-mono flex items-center justify-center bg-[radial-gradient(#0f0_1px,transparent_1px)] bg-[size:20px_20px]">
+      <div className="min-h-screen bg-black text-green-400 font-mono flex items-center justify-center bg-[radial-gradient(#0f0_1px,transparent_1px)] bg-[size:20px_20px] overflow-y-hidden">
         <div className="text-center animate-pulse space-y-4">
           <h1 className="text-4xl md:text-5xl font-bold neon-title">
             Morse iT! 3.0

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -29,8 +30,35 @@ export async function POST(req: Request) {
       );
     }
 
-    const updateData: Record<string, Date> = {};
-    updateData[field] = new Date();
+    const now = new Date();
+    const previousField = `ans${number - 1}` as keyof typeof user;
+    const previousTime = user[previousField] as Date | null;
+
+    let pointToAdd = 1; // default point
+
+    if (previousTime) {
+      const diffInMinutes =
+        (now.getTime() - new Date(previousTime).getTime()) / (1000 * 60);
+
+      if (diffInMinutes <= 2) {
+        pointToAdd = 10;
+      } else if (diffInMinutes <= 4) {
+        pointToAdd = 8;
+      } else if (diffInMinutes <= 6) {
+        pointToAdd = 6;
+      } else if (diffInMinutes <= 8) {
+        pointToAdd = 4;
+      } else if (diffInMinutes <= 10) {
+        pointToAdd = 2;
+      }
+    }
+
+    const updateData: Prisma.UserUpdateInput = {
+      [field]: now,
+      point: {
+        increment: pointToAdd,
+      },
+    };
 
     await prisma.user.update({
       where: { id },
@@ -38,7 +66,10 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(
-      { message: `Answer ${field} set successfully` },
+      {
+        message: `Answer ${field} set successfully`,
+        pointAwarded: pointToAdd,
+      },
       { status: 200 }
     );
   } catch (error) {

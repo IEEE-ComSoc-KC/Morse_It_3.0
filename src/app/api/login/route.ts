@@ -35,8 +35,7 @@ export async function POST(req: Request) {
       await prisma.user.update({
         where: { id: user.id },
         data: { 
-          ans0: new Date(), 
-          final_string: user.id
+          ans0: new Date(),
         },
       });
       hasStarted = true; // Update status since we just set it
