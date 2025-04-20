@@ -154,7 +154,7 @@ export default function DynamicPage({ params }: PageProps) {
                       <img
                         src={correctData.image}
                         alt={`Question ${id}`}
-                        className="object-contain transition-transform duration-300 ease-in-out"
+                        className="object-cover transition-transform duration-300 ease-in-out"
                         style={{ transformStyle: "preserve-3d" }}
                       />
                     </div>
