@@ -2,9 +2,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const topPlayers = await prisma.user.findMany({
+    const users = await prisma.user.findMany({
       select: {
         name: true,
+        phone: true,
         point: true,
         ans0: true,
         ans1: true,
@@ -16,25 +17,20 @@ export async function GET() {
       },
     });
 
-    const filteredPlayers = topPlayers.filter(
-      (player) => !(player.ans1 === null && player.point === 0)
-    );
-
-    const processedPlayers = filteredPlayers.map((player) => {
+    const processedUsers = users.map((user) => {
       const answers = [
-        player.ans0,
-        player.ans1,
-        player.ans2,
-        player.ans3,
-        player.ans4,
-        player.ans5,
-        player.ans6,
+        user.ans0,
+        user.ans1,
+        user.ans2,
+        user.ans3,
+        user.ans4,
+        user.ans5,
+        user.ans6,
       ];
 
       const start = answers[0] ? new Date(answers[0]) : null;
       let lastAnsweredTime: Date | null = null;
 
-      // Find the last non-null answer time
       for (let i = answers.length - 1; i >= 0; i--) {
         if (answers[i]) {
           lastAnsweredTime = new Date(answers[i] as Date);
@@ -48,44 +44,45 @@ export async function GET() {
 
       if (start && lastAnsweredTime) {
         const timeDifference = lastAnsweredTime.getTime() - start.getTime();
-        const timeInSeconds = timeDifference / 1000;
+        const totalSeconds = timeDifference / 1000;
 
-        hours = Math.floor(timeInSeconds / 3600);
-        minutes = Math.floor((timeInSeconds % 3600) / 60);
-        seconds = Math.floor(timeInSeconds % 60);
+        hours = Math.floor(totalSeconds / 3600);
+        minutes = Math.floor((totalSeconds % 3600) / 60);
+        seconds = Math.floor(totalSeconds % 60);
       }
 
       return {
-        name: player.name,
-        point: player.point,
+        name: user.name,
+        phone: user.phone,
+        point: user.point,
         timeTaken: { hours, minutes, seconds },
       };
     });
 
-    // Sort by point DESC, then by total time ASC
-    processedPlayers.sort((a, b) => {
+    // Sort by point DESC, then timeTaken ASC
+    processedUsers.sort((a, b) => {
       if (b.point !== a.point) return b.point - a.point;
 
-      const aTotalSeconds =
+      const aTime =
         a.timeTaken.hours * 3600 +
         a.timeTaken.minutes * 60 +
         a.timeTaken.seconds;
-      const bTotalSeconds =
+      const bTime =
         b.timeTaken.hours * 3600 +
         b.timeTaken.minutes * 60 +
         b.timeTaken.seconds;
 
-      return aTotalSeconds - bTotalSeconds;
+      return aTime - bTime;
     });
 
-    return new Response(JSON.stringify(processedPlayers), {
+    return new Response(JSON.stringify(processedUsers), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error in GET /api/participants:", error);
     return new Response("Internal Server Error", { status: 500 });
   }
 }

@@ -1,12 +1,15 @@
 "use client";
 
 import { useUser } from "@/app/context/UserContext";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ResultPage() {
   const { userId } = useUser(); // Get user context, which contains user id
   const [point, setPoint] = useState<number | null>(null);
   const [timeTaken, setTimeTaken] = useState<string>("");
+
+  const router = useRouter()
 
   useEffect(() => {
     // Ensure user ID exists before making the request
@@ -71,6 +74,15 @@ export default function ResultPage() {
           <p className="text-xl text-green-300 mt-2">
             {timeTaken ? timeTaken : "Loading..."}
           </p>
+        </div>
+
+        <div className="pt-4">
+          <button
+            onClick={() => router.push("/leaderboard")}
+            className="mt-4 bg-black border border-green-500 text-green-400 px-6 py-2 rounded-md hover:bg-green-800 hover:text-black transition-all duration-200 shadow-[0_0_10px_#00ff00]"
+          >
+            View Leaderboard
+          </button>
         </div>
 
         <footer className="pt-4 border-t border-green-900 text-xs text-green-500">

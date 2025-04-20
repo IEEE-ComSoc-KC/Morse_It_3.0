@@ -17,9 +17,11 @@ export default function DynamicPage({ params }: PageProps) {
 
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState("");
-  const [isAccess, setIsAccess] = useState(false)
+  const [isAccess, setIsAccess] = useState(false);
 
   const { userId, finalString } = useUser();
+
+  const correctData = answers[id];
 
   const checkProgress = async () => {
     console.log("inside check progress", userId, finalString);
@@ -36,7 +38,6 @@ export default function DynamicPage({ params }: PageProps) {
       console.log("page dynamic", response);
 
       if (response.status === 204) {
-        // All questions completed
         router.push("/final");
         return;
       }
@@ -48,7 +49,6 @@ export default function DynamicPage({ params }: PageProps) {
       }
 
       const data = await response.json();
-      console.log(data);
       const nextQuestionField = data.nextQuestionField;
 
       if (`ans${id}` === nextQuestionField) {
@@ -66,13 +66,12 @@ export default function DynamicPage({ params }: PageProps) {
       console.error("Error while checking progress:", error);
     }
   };
- 
 
-  const handleSubmit = async(e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const correctAnswer = answers[id];
-    if (answer.trim().toLowerCase() === correctAnswer?.toLowerCase()) {
+    const correctAnswer = correctData?.answer;
 
+    if (answer.trim().toLowerCase() === correctAnswer?.toLowerCase()) {
       try {
         const response = await fetch("/api/setans", {
           method: "POST",
@@ -81,14 +80,14 @@ export default function DynamicPage({ params }: PageProps) {
           },
           body: JSON.stringify({ id: userId, number: id }),
         });
-        console.log(response);
+
         if (response.ok) {
           const nextId = (parseInt(id) + 1).toString();
           if (nextId === "7") router.push("/final");
           else router.push(`/${nextId}`);
         }
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
     } else {
       setError("❌ Answer is wrong. Try again!");
@@ -97,10 +96,9 @@ export default function DynamicPage({ params }: PageProps) {
 
   useEffect(() => {
     checkProgress();
-  }, [])
+  }, []);
 
-  
-  if (isAccess)
+  if (isAccess && correctData)
     return (
       <div className="min-h-screen bg-black text-green-400 font-mono bg-[radial-gradient(#0f0_1px,transparent_1px)] bg-[size:20px_20px]">
         <Navbar questionNumber={id} />
@@ -114,10 +112,22 @@ export default function DynamicPage({ params }: PageProps) {
           </h2>
 
           <img
-            src={`/questions/${id}.jpg`}
+            src={correctData.image}
             alt={`Question ${id}`}
             className="mx-auto rounded-lg border border-green-500 p-2 max-h-72 object-contain mb-6"
           />
+
+          {correctData.audio && (
+            <div className="mb-6">
+              <audio controls className="w-full outline-none">
+                <source src={correctData.audio} type="audio/wav" />
+                Your browser does not support the audio element.
+              </audio>
+              <p className="text-xs text-green-400 mt-2 italic">
+                🔊 Listen carefully...
+              </p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <input

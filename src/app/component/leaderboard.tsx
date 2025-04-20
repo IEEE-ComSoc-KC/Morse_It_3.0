@@ -2,10 +2,16 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
+type TimeTaken = {
+  hours: number;
+  minutes: number;
+  seconds: number;
+};
+
 type Player = {
   name: string;
   point: number;
-  timeTaken: string;
+  timeTaken: TimeTaken;
 };
 
 export default function Leaderboard() {
@@ -17,6 +23,7 @@ export default function Leaderboard() {
     try {
       const response = await fetch("/api/leaderboard");
       const json = await response.json();
+      console.log(json)
       setData(json);
     } catch (error) {
       console.error("Error fetching leaderboard:", error);
@@ -27,7 +34,7 @@ export default function Leaderboard() {
     getLeaderBoard();
     const interval = setInterval(() => {
       getLeaderBoard();
-    }, 10000); // 10 seconds
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -39,6 +46,11 @@ export default function Leaderboard() {
 
   const showMore = () => {
     setVisibleCount((prev) => prev + 10);
+  };
+
+  const formatTime = (time: TimeTaken) => {
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    return `${pad(time.hours)}:${pad(time.minutes)}:${pad(time.seconds)}`;
   };
 
   return (
@@ -81,7 +93,7 @@ export default function Leaderboard() {
                   <span>{index + 1}</span>
                   <span className="truncate">{user.name}</span>
                   <span>{user.point}</span>
-                  <span>{user.timeTaken}</span>
+                  <span>{formatTime(user.timeTaken)}</span>
                 </div>
               ))}
 
