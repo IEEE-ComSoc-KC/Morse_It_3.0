@@ -5,7 +5,7 @@ export const answers: Record<string, { image: string; audio?: string, answer: st
     answer: "PISCATAWAY"
   },
   "2": {
-    image: "/questions/3.jpg",
+    image: "/questions/2.jpg",
     answer: "KENTUCKY"
   },
   "3": {

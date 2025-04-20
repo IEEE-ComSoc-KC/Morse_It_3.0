@@ -6,6 +6,7 @@ import { answers } from "@/data/answers";
 import Navbar from "@/app/component/navbar";
 import { useUser } from "@/app/context/UserContext";
 import Leaderboard from "@/app/component/leaderboard";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -111,11 +112,57 @@ export default function DynamicPage({ params }: PageProps) {
             Morse Code Puzzle Challenge
           </h2>
 
-          <img
-            src={correctData.image}
-            alt={`Question ${id}`}
-            className="mx-auto rounded-lg border border-green-500 p-2 max-h-72 object-contain mb-6"
-          />
+          <div className="mb-6 rounded-lg border border-green-500 h-[300px] relative overflow-hidden">
+            <TransformWrapper
+              initialScale={1}
+              minScale={0.5}
+              maxScale={5}
+              doubleClick={{ mode: "reset" }}
+              wheel={{ step: 0.2 }}
+              pinch={{ step: 0.5 }}
+              panning={{ velocityDisabled: true }}
+              centerOnInit
+              centerZoomedOut
+            >
+              {({ zoomIn, zoomOut, resetTransform }) => (
+                <div className="flex flex-col items-center gap-2 w-full h-full relative">
+                  <div className="flex gap-2 mb-2 absolute top-3 z-30">
+                    <button
+                      onClick={() => zoomIn()}
+                      className="px-3 py-1 text-sm bg-green-600 text-white rounded"
+                    >
+                      Zoom In
+                    </button>
+                    <button
+                      onClick={() => zoomOut()}
+                      className="px-3 py-1 text-sm bg-green-600 text-white rounded"
+                    >
+                      Zoom Out
+                    </button>
+                    <button
+                      onClick={() => resetTransform()}
+                      className="px-3 py-1 text-sm bg-green-600 text-white rounded"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                  <TransformComponent>
+                    <div
+                      className="w-full h-full flex justify-center items-center perspective-3d"
+                      style={{ perspective: "1000px" }}
+                    >
+                      <img
+                        src={correctData.image}
+                        alt={`Question ${id}`}
+                        className="object-contain transition-transform duration-300 ease-in-out"
+                        style={{ transformStyle: "preserve-3d" }}
+                      />
+                    </div>
+                  </TransformComponent>
+                </div>
+              )}
+            </TransformWrapper>
+          </div>
 
           {correctData.audio && (
             <div className="mb-6">
