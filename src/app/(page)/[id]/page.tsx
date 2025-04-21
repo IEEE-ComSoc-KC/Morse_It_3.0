@@ -17,7 +17,7 @@ export default function DynamicPage({ params }: PageProps) {
   const router = useRouter();
 
   const [answer, setAnswer] = useState("");
-  const [error, setError] = useState("");
+  // const [error, setError] = useState("");
   const [isAccess, setIsAccess] = useState(false);
 
   const { userId, finalString } = useUser();
@@ -68,32 +68,32 @@ export default function DynamicPage({ params }: PageProps) {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const correctAnswer = correctData?.answer;
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   const correctAnswer = correctData?.answer;
 
-    if (answer.trim().toLowerCase() === correctAnswer?.toLowerCase()) {
-      try {
-        const response = await fetch("/api/setans", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id: userId, number: id }),
-        });
+  //   if (answer.trim().toLowerCase() === correctAnswer?.toLowerCase()) {
+  //     try {
+  //       const response = await fetch("/api/setans", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ id: userId, number: id }),
+  //       });
 
-        if (response.ok) {
-          const nextId = (parseInt(id) + 1).toString();
-          if (nextId === "7") router.push("/final");
-          else router.push(`/${nextId}`);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    } else {
-      setError("❌ Answer is wrong. Try again!");
-    }
-  };
+  //       if (response.ok) {
+  //         const nextId = (parseInt(id) + 1).toString();
+  //         if (nextId === "7") router.push("/final");
+  //         else router.push(`/${nextId}`);
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   } else {
+  //     setError("❌ Answer is wrong. Try again!");
+  //   }
+  // };
 
   useEffect(() => {
     checkProgress();
@@ -176,7 +176,7 @@ export default function DynamicPage({ params }: PageProps) {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form className="space-y-4">
             <input
               type="text"
               value={answer}
@@ -184,7 +184,7 @@ export default function DynamicPage({ params }: PageProps) {
               placeholder="Enter your answer here..."
               className="w-full p-3 bg-black text-green-300 border border-green-500 rounded-md placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
-            {error && <p className="text-red-400 text-sm">{error}</p>}
+            {/* {error && <p className="text-red-400 text-sm">{error}</p>} */}
             <button
               type="submit"
               className="bg-black border border-green-500 text-green-400 px-6 py-2 rounded-md hover:bg-green-800 hover:text-black transition-all duration-200 shadow-[0_0_10px_#00ff00]"
