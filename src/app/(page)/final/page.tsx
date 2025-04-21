@@ -76,14 +76,14 @@ export default function ResultPage() {
           </p>
         </div>
 
-        <div className="pt-4">
+        {/* <div className="pt-4">
           <button
             onClick={() => router.push("/leaderboard")}
             className="mt-4 bg-black border border-green-500 text-green-400 px-6 py-2 rounded-md hover:bg-green-800 hover:text-black transition-all duration-200 shadow-[0_0_10px_#00ff00]"
           >
             View Leaderboard
           </button>
-        </div>
+        </div> */}
 
         <footer className="pt-4 border-t border-green-900 text-xs text-green-500">
           IEEE ComSoc Kerala Chapter | Morse iT! 3.0
