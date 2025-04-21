@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@/app/context/UserContext";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ResultPage() {
@@ -9,7 +9,7 @@ export default function ResultPage() {
   const [point, setPoint] = useState<number | null>(null);
   const [timeTaken, setTimeTaken] = useState<string>("");
 
-  const router = useRouter()
+  // const router = useRouter()
 
   useEffect(() => {
     // Ensure user ID exists before making the request
