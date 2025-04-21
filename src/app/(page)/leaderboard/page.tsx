@@ -12,6 +12,7 @@ type Participant = {
   phone: string;
   point: number;
   timeTaken: TimeTaken;
+  currentPosition: number;
 };
 
 export default function ParticipantsPage() {
@@ -43,29 +44,35 @@ export default function ParticipantsPage() {
 
   return (
     <div className="w-screen h-screen bg-black text-green-400 font-mono p-4 sm:p-8 overflow-auto">
-      <h1 className="text-3xl font-bold text-center mb-8 neon-title">🧑‍💼 Participants List</h1>
+      <h1 className="text-3xl font-bold text-center mb-8 neon-title">
+        🧑‍💼 Participants List
+      </h1>
 
-      <div className="w-full max-w-6xl mx-auto border border-green-700 rounded-xl shadow-[0_0_15px_#00ff00]">
+      <div className="w-full max-w-7xl mx-auto border border-green-700 rounded-xl shadow-[0_0_15px_#00ff00]">
         {/* Table Header */}
-        <div className="grid grid-cols-[60px_1.5fr_1.5fr_1fr_1fr] sm:grid-cols-[80px_1.5fr_1.5fr_1fr_1fr] text-center font-semibold border-b border-green-600 py-3 px-4 bg-green-900/10 text-sm sm:text-base">
+        <div className="grid grid-cols-[60px_1.5fr_1.5fr_1fr_1fr_1fr] sm:grid-cols-[80px_1.5fr_1.5fr_1fr_1fr_1fr] text-center font-semibold border-b border-green-600 py-3 px-4 bg-green-900/10 text-sm sm:text-base">
           <span>Sl. No</span>
           <span>Name</span>
           <span>Phone</span>
           <span>Points</span>
           <span>Time</span>
+          <span>Current Qn</span>
         </div>
 
         {/* Rows */}
         {data.map((user, index) => (
           <div
             key={index}
-            className="grid grid-cols-[60px_1.5fr_1.5fr_1fr_1fr] sm:grid-cols-[80px_1.5fr_1.5fr_1fr_1fr] text-center items-center py-2 px-4 border-b border-green-800 hover:bg-green-800/10 transition-all text-sm sm:text-base"
+            className="grid grid-cols-[60px_1.5fr_1.5fr_1fr_1fr_1fr] sm:grid-cols-[80px_1.5fr_1.5fr_1fr_1fr_1fr] text-center items-center py-2 px-4 border-b border-green-800 hover:bg-green-800/10 transition-all text-sm sm:text-base"
           >
             <span className="font-semibold">{index + 1}</span>
             <span className="truncate">{user.name}</span>
             <span className="truncate">{user.phone}</span>
             <span>{user.point}</span>
             <span>{formatTime(user.timeTaken)}</span>
+            <span>
+              {user.currentPosition >= 0 ? `Q${user.currentPosition + 1}` : "—"}
+            </span>
           </div>
         ))}
       </div>

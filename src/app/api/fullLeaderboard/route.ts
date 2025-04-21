@@ -30,10 +30,12 @@ export async function GET() {
 
       const start = answers[0] ? new Date(answers[0]) : null;
       let lastAnsweredTime: Date | null = null;
+      let currentPosition = -1;
 
       for (let i = answers.length - 1; i >= 0; i--) {
         if (answers[i]) {
           lastAnsweredTime = new Date(answers[i] as Date);
+          currentPosition = i;
           break;
         }
       }
@@ -55,6 +57,7 @@ export async function GET() {
         name: user.name,
         phone: user.phone,
         point: user.point,
+        currentPosition, // <-- added this field
         timeTaken: { hours, minutes, seconds },
       };
     });
