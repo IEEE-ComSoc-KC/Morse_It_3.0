@@ -14,7 +14,7 @@ export const answers: Record<string, { image: string; audio?: string, answer: st
   },
   "4": {
     image: "/questions/4.jpg",
-    audio: "/audio/5.wav",
+    audio: "/audio/4.wav",
     answer: "TELSTAR"
   },
   "5": {
@@ -24,7 +24,7 @@ export const answers: Record<string, { image: string; audio?: string, answer: st
   },
   "6": {
     image: "/questions/6.jpg",
-    audio: "/audio/5.wav",
+    audio: "/audio/6.wav",
     answer: "WAVE"
   },
 };
